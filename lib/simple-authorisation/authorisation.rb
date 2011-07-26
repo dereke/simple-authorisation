@@ -12,9 +12,11 @@ module Simple
       allow = route_rules.fetch(:allow, [])
       deny = route_rules.fetch(:deny, [])
       user = options.fetch(:user, nil)
+      anonymous_user_class = options.fetch(:anonymous_user_class, NilClass)
+
       return true if allow.index('?')
-      return false if deny.index('?') and user.nil?
-      return true if allow.index('*') and not user.nil?
+      return false if deny.index('?') and user.is_a? anonymous_user_class
+      return true if allow.index('*') and not user.is_a? anonymous_user_class
 
       false
     end
