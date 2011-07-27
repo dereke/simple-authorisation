@@ -33,5 +33,13 @@ module Simple
       Simple::Authorisation.route '/test', :deny=> ['?']
       Simple::Authorisation.is_allowed?('/test/page/low', :user => nil).should be_true
     end
+
+    it "should apply rules just to a particular method" do
+      Simple::Authorisation.post '/test', :deny => ['?']
+      Simple::Authorisation.get '/test', :allow => ['?']
+
+      Simple::Authorisation.is_allowed?('/test', :method => :post, :user => nil).should be_false
+      Simple::Authorisation.is_allowed?('/test', :method => :get, :user => nil).should be_true
+    end
   end
 end

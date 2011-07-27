@@ -1,17 +1,38 @@
 module Simple
   module Authorisation
+    def self.post(name, options)
+      options[:method] = :post
+      self.route(name, options)
+    end
+
+    def self.get(name, options)
+      options[:method] = :get
+      self.route(name, options)
+    end
+
     def self.route(name, options)
       @@routes ||= {}
-      @@routes[name] = options
+      @@routes[name] = {} unless @@routes.has_key?(name)
+
+      route_settings  = @@routes[name]
+      route_settings[options.delete(:method) || :default] = options
     end
 
     def self.is_allowed?(route_name, options)
       matching_route = (@@routes.keys.sort.reverse.select{|route | route_name.start_with?(route) }).first
-      route_rules = @@routes[matching_route]
-      raise "no rules found for #{route_name}" if route_rules.nil?
+
+      route_settings = @@routes[matching_route]
+      raise "no settings found for #{route_name}" if route_settings.nil?
+
+      method = options.fetch(:method, :default)
+      route_rules = route_settings[method] || route_settings[:default]
+      raise "no rules found for #{route_name} method #{method}" if route_rules.nil?
+
       allow = route_rules.fetch(:allow, [])
       deny = route_rules.fetch(:deny, [])
       user = options.fetch(:user, nil)
+
+
       anonymous_user_class = options.fetch(:anonymous_user_class, NilClass)
 
       return true if allow.index('?')
