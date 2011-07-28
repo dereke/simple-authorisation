@@ -15,18 +15,22 @@ module Simple
       @@routes[name] = {} unless @@routes.has_key?(name)
 
       route_settings  = @@routes[name]
-      route_settings[options.delete(:method) || :default] = options
+      route_settings[options.delete(:method) || :any] = options
+    end
+
+    def self.clear
+      @@routes = {}
     end
 
     def self.is_allowed?(route_name, options)
       matching_route = (@@routes.keys.sort.reverse.select{|route | route_name.start_with?(route) }).first
 
       route_settings = @@routes[matching_route]
-      raise "no settings found for #{route_name}" if route_settings.nil?
+      raise NoSettingsForRoute.new(route_name) if route_settings.nil?
 
-      method = options.fetch(:method, :default)
-      route_rules = route_settings[method] || route_settings[:default]
-      raise "no rules found for #{route_name} method #{method}" if route_rules.nil?
+      method = options.fetch(:method, :any)
+      route_rules = route_settings[method] || route_settings[:any]
+      raise NoRulesForMethod.new(route_name, method) if route_rules.nil?
 
       allow = route_rules.fetch(:allow, [])
       deny = route_rules.fetch(:deny, [])
@@ -40,6 +44,27 @@ module Simple
       return true if allow.index('*') and not user.is_a? anonymous_user_class
 
       false
+    end
+
+    class NoRulesForMethod < Exception
+      def initialize(route_name, method)
+        @route_name = route_name
+        @method = method
+      end
+
+      def message
+        "no rules found for #{@route_name} method #{@method}"
+      end
+    end
+
+    class NoSettingsForRoute < Exception
+      def initialize(route_name)
+        @route_name = route_name
+      end
+
+      def message
+        "No settings for route #{@route_name}"
+      end
     end
   end
 end

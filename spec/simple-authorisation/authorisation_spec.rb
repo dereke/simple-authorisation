@@ -2,6 +2,9 @@ require 'simple-authorisation/authorisation'
 
 module Simple
   describe Authorisation do
+    before do
+      Simple::Authorisation.clear
+    end
     it "should allow requests to anonymous users" do
       Simple::Authorisation.route '/test', :allow => ['?']
       Simple::Authorisation.is_allowed?('/test', :user => nil).should be_true
@@ -40,6 +43,16 @@ module Simple
 
       Simple::Authorisation.is_allowed?('/test', :method => :post, :user => nil).should be_false
       Simple::Authorisation.is_allowed?('/test', :method => :get, :user => nil).should be_true
+    end
+
+    it "should apply rule to any method when none specified" do
+      Simple::Authorisation.route '/test', :allow => ['?']
+      Simple::Authorisation.is_allowed?('/test', :method => :get, :user => nil).should be_true
+      Simple::Authorisation.is_allowed?('/test', :method => :post, :user => nil).should be_true
+    end
+
+    it "should raise an exception when checking is_allowed for a route with no rules" do
+      lambda {Simple::Authorisation.is_allowed?('/test', :method => :get, :user => nil)}.should raise_error(Simple::Authorisation::NoSettingsForRoute)
     end
   end
 end
