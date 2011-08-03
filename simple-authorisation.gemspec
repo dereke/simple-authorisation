@@ -3,7 +3,7 @@ $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = 'simple-authorisation'
-  s.version     = '0.0.4'
+  s.version     = '0.0.5'
   s.authors     = ["Derek Ekins"]
   s.description = 'Handles authorisation only'
   s.summary     = "simple-authorisation-#{s.version}"

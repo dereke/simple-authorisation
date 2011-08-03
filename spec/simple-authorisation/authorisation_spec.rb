@@ -54,5 +54,28 @@ module Simple
     it "should raise an exception when checking is_allowed for a route with no rules" do
       lambda {Simple::Authorisation.is_allowed?('/test', :method => :get, :user => nil)}.should raise_error(Simple::Authorisation::NoSettingsForRoute)
     end
+
+    it "should be pass if we ask the user object if the user is allowed to perform the action when they are" do
+      user = Object.new
+      user.stub!(:actions).and_return(['test-action'])
+
+      Simple::Authorisation.route '/test', :allow => ['test-action']
+      Simple::Authorisation.is_allowed?('/test', :method => :get, :user => user).should be_true
+    end
+
+    it "should be fail if we ask the user object if the user is allowed to perform the action and they are not" do
+      user = Object.new
+      user.stub!(:actions).and_return(['wrong-action'])
+
+      Simple::Authorisation.route '/test', :allow => ['test-action']
+      Simple::Authorisation.is_allowed?('/test', :method => :get, :user => user).should be_false
+    end
+
+    it "should not call the actions method if it does not exist" do
+      user = Object.new
+
+      Simple::Authorisation.route '/test', :allow => ['test-action']
+      lambda{ Simple::Authorisation.is_allowed?('/test', :method => :get, :user => user)}.should_not raise_error
+    end
   end
 end

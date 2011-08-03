@@ -39,9 +39,12 @@ module Simple
 
       anonymous_user_class = options.fetch(:anonymous_user_class, NilClass)
 
-      return true if allow.index('?')
-      return false if deny.index('?') and user.is_a? anonymous_user_class
-      return true if allow.index('*') and not user.is_a? anonymous_user_class
+      return true   if allow.index('?')
+      return false  if deny.index('?')  and     user.is_a? anonymous_user_class
+      return true   if allow.index('*') and not user.is_a? anonymous_user_class
+      allow.each do | allowed |
+        return true if user.actions.include?(allowed)
+      end if user.respond_to? :actions
 
       false
     end
