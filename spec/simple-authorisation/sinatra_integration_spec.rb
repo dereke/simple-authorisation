@@ -10,11 +10,11 @@ module Sinatra
     end
 
     it "asks Simple::Authorisation if access is allowed" do
+      Simple::Authorisation.should_receive(:is_allowed?).with("/", {:user=>nil, :anonymous_user_class => NilClass, :method => :get})
+
       Simple::Authorisation.route '/', :allow => ['?']
       @session.get '/'
 
-      # this fails for some reason but I know that it does work - what is wrong???
-      Simple::Authorisation.should_receive(:is_allowed?).with("/", {:user=>nil})
     end
 
   end

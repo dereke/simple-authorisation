@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    simple-authorisation (0.0.4)
+    simple-authorisation (0.0.7)
       sinatra (~> 1.2.6)
 
 GEM

@@ -77,5 +77,13 @@ module Simple
       Simple::Authorisation.route '/test', :allow => ['test-action']
       lambda{ Simple::Authorisation.is_allowed?('/test', :method => :get, :user => user)}.should_not raise_error
     end
+
+    it "should allow wildcards in parts of the route" do
+      user = Object.new
+      user.stub!(:actions).and_return(['test-action'])
+
+      Simple::Authorisation.route '/test/*/blah', :allow => ['test-action']
+      Simple::Authorisation.is_allowed?('/test/something/blah', :method => :get, :user => user).should be_true
+    end
   end
 end

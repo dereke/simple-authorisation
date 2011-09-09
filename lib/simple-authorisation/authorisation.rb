@@ -23,7 +23,8 @@ module Simple
     end
 
     def self.is_allowed?(route_name, options)
-      matching_route = (@@routes.keys.sort.reverse.select{|route | route_name.start_with?(route) }).first
+      matching_route = (@@routes.keys.sort.reverse.select{|route | route_name =~ /#{route.gsub('*', '.+')}/}).first
+      matching_route = (@@routes.keys.sort.reverse.select{|route | route_name.start_with?(route) }).first if matching_route.nil?
 
       route_settings = @@routes[matching_route]
       raise NoSettingsForRoute.new(route_name) if route_settings.nil?
