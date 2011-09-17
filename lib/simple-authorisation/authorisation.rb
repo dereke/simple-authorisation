@@ -1,3 +1,6 @@
+require File.join(File.dirname(__FILE__), 'route_rule_finder')
+require File.join(File.dirname(__FILE__), 'no_rules_for_method')
+
 module Simple
   module Authorisation
     def self.post(name, options)
@@ -22,12 +25,10 @@ module Simple
       @@routes = {}
     end
 
-    def self.is_allowed?(route_name, options)
-      matching_route = (@@routes.keys.sort.reverse.select{|route | route_name =~ /#{route.gsub('*', '.+')}/}).first
-      matching_route = (@@routes.keys.sort.reverse.select{|route | route_name.start_with?(route) }).first if matching_route.nil?
 
-      route_settings = @@routes[matching_route]
-      raise NoSettingsForRoute.new(route_name) if route_settings.nil?
+    def self.is_allowed?(route_name, options)
+      route_matcher = RouteRuleFinder.new(@@routes)
+      route_settings = route_matcher.find(route_name)
 
       method = options.fetch(:method, :any)
       route_rules = route_settings[method] || route_settings[:any]
@@ -36,7 +37,6 @@ module Simple
       allow = route_rules.fetch(:allow, [])
       deny = route_rules.fetch(:deny, [])
       user = options.fetch(:user, nil)
-
 
       anonymous_user_class = options.fetch(:anonymous_user_class, NilClass)
 
@@ -50,25 +50,12 @@ module Simple
       false
     end
 
-    class NoRulesForMethod < Exception
-      def initialize(route_name, method)
-        @route_name = route_name
-        @method = method
-      end
-
-      def message
-        "no rules found for #{@route_name} method #{@method}"
-      end
+    def self.match_style=(style)
+      @@match_style = style
     end
 
-    class NoSettingsForRoute < Exception
-      def initialize(route_name)
-        @route_name = route_name
-      end
-
-      def message
-        "No settings for route #{@route_name}"
-      end
+    def self.match_style
+      @@match_style || :default
     end
   end
 end
