@@ -27,7 +27,7 @@ module Sinatra
       end
 
       app.get '/403' do
-        haml 'The action you have tried to perform is not available', :layout => use_layout?
+        haml 'The action you have tried to perform is not available'
       end
     end
 
