@@ -85,5 +85,11 @@ module Simple
       Simple::Authorisation.route '/test/*/blah', :allow => ['test-action']
       Simple::Authorisation.is_allowed?('/test/something/blah', :method => :get, :user => user).should be_true
     end
+
+    it "should only match routes exactly when configured to do so" do
+      Simple::Authorisation.match_style = :exact
+      Simple::Authorisation.route '/test', :allow => ['?']
+      lambda{ Simple::Authorisation.is_allowed?('/test/page', :user => nil) }.should  raise_error(Simple::Authorisation::NoSettingsForRoute)
+    end
   end
 end

@@ -1,8 +1,11 @@
 require File.join(File.dirname(__FILE__), 'route_rule_finder')
+require File.join(File.dirname(__FILE__), 'exact_route_rule_finder')
 require File.join(File.dirname(__FILE__), 'no_rules_for_method')
 
 module Simple
   module Authorisation
+    @@match_style = :default
+
     def self.post(name, options)
       options[:method] = :post
       self.route(name, options)
@@ -27,7 +30,11 @@ module Simple
 
 
     def self.is_allowed?(route_name, options)
-      route_matcher = RouteRuleFinder.new(@@routes)
+      match_styles = {
+          :default  => RouteRuleFinder,
+          :exact    => ExactRouteRuleFinder
+      }
+      route_matcher = match_styles[match_style].new(@@routes)
       route_settings = route_matcher.find(route_name)
 
       method = options.fetch(:method, :any)
@@ -55,7 +62,7 @@ module Simple
     end
 
     def self.match_style
-      @@match_style || :default
+      @@match_style
     end
   end
 end

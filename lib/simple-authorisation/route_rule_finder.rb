@@ -4,10 +4,11 @@ module Simple
     class RouteRuleFinder
       def initialize(routes)
         @routes = routes
+        @find_by = [:route_by_wild_card, :route_starts_with]
       end
 
       def route_by_wild_card(route_name)
-        (@routes.keys.sort.reverse.select{|route | route_name =~ /#{route.gsub('*', '.+')}/}).first
+        (@routes.keys.sort.reverse.select{|route | route_name =~ /^#{route.gsub('*', '.+')}$/}).first
       end
 
       def route_starts_with(route_name)
@@ -15,12 +16,14 @@ module Simple
       end
 
       def find(route_name)
-        matching_route = route_by_wild_card(route_name)
-        matching_route = route_starts_with(route_name) if matching_route.nil?
+        matching_route = nil
+        @find_by.each do |method|
+          matching_route = send(method, route_name)
+          break unless matching_route.nil?
+        end
 
         route_settings = @routes[matching_route]
         raise NoSettingsForRoute.new(route_name) if route_settings.nil?
-
 
         route_settings
       end
