@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    simple-authorisation (0.0.13)
+    simple-authorisation (0.0.14)
       builder (~> 3.0)
       sinatra (~> 1.2.6)
 
