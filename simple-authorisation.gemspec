@@ -3,7 +3,7 @@ $LOAD_PATH.unshift File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = 'simple-authorisation'
-  s.version     = '0.0.12'
+  s.version     = '0.0.13'
   s.authors     = ["Derek Ekins"]
   s.description = 'Handles authorisation only'
   s.summary     = "simple-authorisation-#{s.version}"
@@ -21,7 +21,7 @@ Thank you for installing simple-authorisation
 }
 
   s.add_dependency 'sinatra', '~> 1.2.6'
-  s.add_dependency 'builder', '~> 2.0'
+  s.add_dependency 'builder', '~> 3.0'
 
   s.add_development_dependency 'rake', '>= 0.9.2'
   s.add_development_dependency 'rspec', '>= 2.6.0'
