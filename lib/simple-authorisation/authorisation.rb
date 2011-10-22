@@ -48,6 +48,8 @@ module Simple
       anonymous_user_class = options.fetch(:anonymous_user_class, NilClass)
 
       return true   if allow.index('?')
+
+      user = user.call if user.is_a? Proc
       return false  if deny.index('?')  and     user.is_a? anonymous_user_class
       return true   if allow.index('*') and not user.is_a? anonymous_user_class
       allow.each do | allowed |
