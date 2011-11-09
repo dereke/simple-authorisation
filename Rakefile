@@ -7,15 +7,18 @@ Bundler::GemHelper.install_tasks
 $:.unshift(File.dirname(__FILE__) + '/lib')
 
 
-desc "Run RSpec"
-RSpec::Core::RakeTask.new do |t|
-  #t.rcov = ENV['RCOV']
-  #t.rcov_opts = %w{--exclude osx\/objc,gems\/,spec\/}
-  t.verbose = true
+task :coverage do
+  require 'simplecov'
+  require 'rspec/core'
+
+  SimpleCov.start do
+    add_filter 'spec'
+  end
+  SimpleCov.start
+  RSpec::Core::Runner.run %w[spec]
 end
 
-
-task :default => [:spec]
+task :default => [:coverage]
 
 require 'rake/clean'
 CLEAN.include %w(**/*.{log,pyc,rbc,tgz} doc)
