@@ -10,21 +10,21 @@ module Sinatra
 
       app.before do
         route_name = request.path
-        request_user = Proc.new { send(options.authorisation_current_user) }
+        request_user = Proc.new { send(settings.authorisation_current_user) }
 
         unless Simple::Authorisation.is_allowed?(
             route_name,
             :user => request_user,
-            :anonymous_user_class => options.authorisation_anonymous_user_class,
+            :anonymous_user_class => settings.authorisation_anonymous_user_class,
             :method => request.request_method.downcase.to_sym)
           session[:return_to] = request.fullpath unless request.fullpath.include?('favicon.ico')
 
           user = request_user.call
 
-          if user.is_a? options.authorisation_anonymous_user_class
-            redirect options.authorisation_login
+          if user.is_a? settings.authorisation_anonymous_user_class
+            redirect settings.authorisation_login
           else
-            redirect options.authorisation_permission_denied
+            redirect settings.authorisation_permission_denied
           end
         end
       end
