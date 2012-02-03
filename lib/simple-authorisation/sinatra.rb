@@ -1,3 +1,4 @@
+require 'cgi'
 require 'sinatra/base'
 
 module Sinatra
@@ -22,7 +23,7 @@ module Sinatra
           user = request_user.call
 
           if user.is_a? settings.authorisation_anonymous_user_class
-            redirect settings.authorisation_login
+            redirect settings.authorisation_login + "?requested_url=#{CGI.escape(request.fullpath)}"
           else
             redirect settings.authorisation_permission_denied
           end
