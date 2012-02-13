@@ -16,6 +16,16 @@ module Simple
       self.route(name, options)
     end
 
+    def self.put(name, options)
+      options[:method] = :put
+      self.route(name, options)
+    end
+
+    def self.delete(name, options)
+      options[:method] = :delete
+      self.route(name, options)
+    end
+
     def self.route(name, options)
       @@routes ||= {}
       @@routes[name] = {} unless @@routes.has_key?(name)
